@@ -1,10 +1,12 @@
-import React from 'react'
-import { Button } from "@/components/ui/button"
+import React from 'react';
+import LoginSignUp from './pages/LoginSignUp'; // Correct import with proper casing
 
 const App = () => {
   return (
-    <Button>Click me</Button>
-  )
-}
+    <main>
+      <LoginSignUp /> {/* Correct JSX syntax */}
+    </main>
+  );
+};
 
-export default App
+export default App;
