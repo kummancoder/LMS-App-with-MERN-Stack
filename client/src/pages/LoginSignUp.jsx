@@ -43,6 +43,7 @@ const LoginSignUp = () => {
     console.log(type === "login" ? loginInput : signupInput);
   };
   return (
+    <div className="flex justify-center items-center h-screen">
     <Tabs defaultValue="login" className="w-[400px]">
       <TabsList className="grid w-full grid-cols-2">
         <TabsTrigger value="signup">Signup</TabsTrigger>
@@ -151,7 +152,9 @@ const LoginSignUp = () => {
         </Card>
       </TabsContent>
     </Tabs>
+  </div>
   );
 };
+
 
 export default LoginSignUp;
