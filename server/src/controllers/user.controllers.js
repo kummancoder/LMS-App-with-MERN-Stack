@@ -64,9 +64,13 @@ const register = asyncHandler(async (req, res) => {
 const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
-  if (!email) {
+  if (!email.trim()) {
     return res.status(400).json(new ApiError(400, "email is required"));
   }
+  if (!password?.trim()) {
+    return res.status(400).json(new ApiError(400, "password is required"));
+  }
+  
   const user = await User.findOne({ email });
 
   if (!user) {
