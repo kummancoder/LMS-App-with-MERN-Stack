@@ -22,19 +22,15 @@ const generateAccessAndRefereshTokens = async (userId) => {
 };
 
 const register = asyncHandler(async (req, res) => {
-  const { fullName, email, userName, password } = req.body;
+  const { fullName, email, password } = req.body;
 
   if (
-    [fullName, email, userName, password].some(
-      (field) => !field || field?.trim() === ""
-    )
+    [fullName, email, password].some((field) => !field || field?.trim() === "")
   ) {
     return res.status(400).json(new ApiError(400, "All fields are required"));
   }
 
-  const existedUser = await User.findOne({
-    $or: [{ email }, { userName }],
-  });
+  const existedUser = await User.findOne({ email });
 
   if (existedUser) {
     return res
@@ -45,7 +41,6 @@ const register = asyncHandler(async (req, res) => {
   const user = await User.create({
     fullName,
     email,
-    userName: userName.toLowerCase(),
     password,
   });
 
@@ -67,16 +62,12 @@ const register = asyncHandler(async (req, res) => {
 });
 
 const login = asyncHandler(async (req, res) => {
-  const { email, userName, password } = req.body;
+  const { email, password } = req.body;
 
-  if (!userName && !email) {
-    return res
-      .status(400)
-      .json(new ApiError(400, "username or email is required"));
+  if (!email) {
+    return res.status(400).json(new ApiError(400, "email is required"));
   }
-  const user = await User.findOne({
-    $or: [{ userName }, { email }],
-  });
+  const user = await User.findOne({ email });
 
   if (!user) {
     return res.status(404).json(new ApiError(404, "User does not exist"));
