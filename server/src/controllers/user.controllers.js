@@ -3,17 +3,19 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
 
-const signupUser = asyncHandler(async (req, res) => {
+const register = asyncHandler(async (req, res) => {
   const { fullName, email, userName, password } = req.body;
 
   if (
-    [fullName, email, userName, password].some((field) => field?.trim() === "")
+    [fullName, email, userName, password].some(
+      (field) => !field || field?.trim() === ""
+    )
   ) {
     return res.status(400).json(new ApiError(400, "All fields are required"));
   }
 
   const existedUser = await User.findOne({
-    $or: [{ email }, { username }],
+    $or: [{ email }, { userName }],
   });
 
   if (existedUser) {
@@ -29,7 +31,9 @@ const signupUser = asyncHandler(async (req, res) => {
     password,
   });
 
-  const createdUser = User.findById(user._id).select("-password -refreshToken");
+  const createdUser = await User.findById(user._id)
+    .select("-password -refreshToken")
+    .lean();
 
   if (!createdUser) {
     return res
@@ -40,7 +44,7 @@ const signupUser = asyncHandler(async (req, res) => {
   }
 
   return res
-    .status(200)
-    .json(new ApiResponse(200, createdUser, "User registered Successfully"));
+    .status(201)
+    .json(new ApiResponse(201, createdUser, "User registered Successfully"));
 });
-export { signupUser };
+export { register };
