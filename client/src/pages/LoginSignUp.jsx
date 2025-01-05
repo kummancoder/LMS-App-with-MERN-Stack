@@ -15,7 +15,7 @@ import { useState } from "react";
 
 const LoginSignUp = () => {
   const [signupInput, setSignupInput] = useState({
-    name: "",
+    fullName: "",
     email: "",
     password: "",
   });
@@ -60,14 +60,14 @@ const LoginSignUp = () => {
             </CardHeader>
             <CardContent className="space-y-2">
               <div className="space-y-1">
-                <Label htmlFor="name">Name</Label>
+                <Label htmlFor="fullName">Name</Label>
                 <Input
                   type="text"
-                  name="name"
-                  id="name"
+                  name="fullName"
+                  id="fullName"
                   required={true}
-                  placeholder="Eg. Kumman"
-                  value={signupInput.name}
+                  placeholder="Eg. Kumman Dhakad"
+                  value={signupInput.fullName}
                   onChange={(e) => changeInputHandler(e, "signup")}
                 />
               </div>
