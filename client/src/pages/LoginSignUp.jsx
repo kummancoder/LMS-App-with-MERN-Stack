@@ -10,7 +10,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  useLoginUserMutation,
+  useRegisterUserMutation,
+} from "@/features/api/authApi";
 import { FolderGit } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 
 const LoginSignUp = () => {
@@ -25,6 +30,24 @@ const LoginSignUp = () => {
     password: "",
   });
 
+  const [
+    registerUser,
+    {
+      data: registerData,
+      error: registerError,
+      isLoading: registerIsLoading,
+      isSuccess: registerSuccess,
+    },
+  ] = useRegisterUserMutation();
+  const [
+    loginUser,
+    {
+      data: loginData,
+      error: loginError,
+      isLoading: loginIsLoading,
+      isSuccess: loginIsSuccess,
+    },
+  ] = useLoginUserMutation();
   const changeInputHandler = (e, type) => {
     const { name, value } = e.target;
     if (type == "signup") {
@@ -41,7 +64,10 @@ const LoginSignUp = () => {
   };
 
   const handleRegistration = (type) => {
-    console.log(type === "login" ? loginInput : signupInput);
+    // console.log(type === "login" ? loginInput : signupInput);
+    const inputData = type === "login" ? loginInput : signupInput;
+    const action = type === "login" ? loginUser : registerUser;
+    action(inputData);
   };
   return (
     <div className="flex justify-center items-center h-screen">
@@ -98,11 +124,18 @@ const LoginSignUp = () => {
             </CardContent>
             <CardFooter>
               <Button
-                onClick={() => {
-                  handleRegistration("signup");
-                }}
+                onClick={() => handleRegistration("signup")}
+                disabled={registerIsLoading}
+                aria-label={registerIsLoading ? "Signing up..." : "Signup"}
               >
-                Signup
+                {registerIsLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Please Wait
+                  </>
+                ) : (
+                  "Signup"
+                )}
               </Button>
             </CardFooter>
           </Card>
@@ -143,11 +176,20 @@ const LoginSignUp = () => {
             </CardContent>
             <CardFooter>
               <Button
+                disabled={loginIsLoading}
                 onClick={() => {
                   handleRegistration("login");
                 }}
+                aria-label={loginIsLoading ? "Logging in..." : "Login"}
               >
-                Login
+                {loginIsLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Please Wait
+                  </>
+                ) : (
+                  "Login"
+                )}
               </Button>
             </CardFooter>
           </Card>
