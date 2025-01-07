@@ -1,10 +1,12 @@
 import React from 'react';
-import LoginSignUp from './pages/LoginSignUp'; // Correct import with proper casing
+import LoginSignUp from './pages/LoginSignUp'; 
+import Navbar from './components/Navbar';
 
 const App = () => {
   return (
     <main>
-      <LoginSignUp /> {/* Correct JSX syntax */}
+      <Navbar/>
+      <LoginSignUp /> 
     </main>
   );
 };
