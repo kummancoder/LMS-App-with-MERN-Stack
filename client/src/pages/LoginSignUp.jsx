@@ -16,7 +16,8 @@ import {
 } from "@/features/api/authApi";
 import { FolderGit } from "lucide-react";
 import { Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const LoginSignUp = () => {
   const [signupInput, setSignupInput] = useState({
@@ -36,7 +37,7 @@ const LoginSignUp = () => {
       data: registerData,
       error: registerError,
       isLoading: registerIsLoading,
-      isSuccess: registerSuccess,
+      isSuccess: registerIsSuccess,
     },
   ] = useRegisterUserMutation();
   const [
@@ -69,6 +70,34 @@ const LoginSignUp = () => {
     const action = type === "login" ? loginUser : registerUser;
     action(inputData);
   };
+
+  useEffect(() => {
+    console.log("Register Error:", registerError);
+    console.log("Register Is Success:", registerIsSuccess);
+    console.log("Register Data:", registerData);
+    if (registerIsSuccess && registerData) {
+      toast.success(registerData.message || "Signup successful.");
+    }
+    if (registerError) {
+      toast.error(registerError.data.message || "Signup Failed");
+    }
+    if (loginIsSuccess && loginData) {
+      toast.success(loginData.message || "Login successful.");
+      navigate("/");
+    }
+    if (loginError) {
+      toast.error(loginError.data.message || "login Failed");
+    }
+  }, [
+    loginIsSuccess,
+    registerIsSuccess,
+    loginIsLoading,
+    registerIsLoading,
+    loginData,
+    registerData,
+    loginError,
+    registerError,
+  ]);
   return (
     <div className="flex justify-center items-center h-screen">
       <Tabs defaultValue="login" className="w-[400px]">
