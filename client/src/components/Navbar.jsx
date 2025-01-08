@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "./ui/button";
 import DarkMode from "../DarkMode";
+import { Link } from "react-router-dom";
 const Navbar = () => {
   const user = true;
   return (
@@ -53,9 +54,9 @@ const Navbar = () => {
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem>My Learning</DropdownMenuItem>
-                  <DropdownMenuItem>Edit Profile</DropdownMenuItem>
-                  <DropdownMenuItem>Log out</DropdownMenuItem>
+                  <DropdownMenuItem><Link to="/my-learning" >My Learning</Link></DropdownMenuItem>
+                  <DropdownMenuItem><Link to="/profile">Edit Profile</Link></DropdownMenuItem>
+                  <DropdownMenuItem><Link to="/log-out">Log out</Link></DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>Dashboard</DropdownMenuItem>
