@@ -13,10 +13,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import React from "react";
 import Course from "./Course";
+import { useLoadUserQuery } from "@/features/api/authApi";
 
 const Profile = () => {
+  const { data: Data, isLoading, isSuccess } = useLoadUserQuery();
   const updatedUserIsLoading = false;
-  const enrolledCourses = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  if (isLoading) return <h1>Profile Loading...</h1>;
+  console.log(Data.data);
+  const { fullName, email, role, avatar, enrolledCourses } = Data.data;
   return (
     <div className="max-w-4xl mx-auto my-24 px-4">
       <h1 className="font-bold text-2xl text-center md:text-left">Profile</h1>
@@ -25,7 +29,7 @@ const Profile = () => {
           <Avatar className="h-24 w-24 md:h-32 md:w-32 mb-4">
             <AvatarImage
               className="rounded-full"
-              src={"https://github.com/shadcn.png"}
+              src={avatar || "https://github.com/shadcn.png"}
               alt="@shadcn"
             />
             <AvatarFallback>CN</AvatarFallback>
@@ -36,7 +40,7 @@ const Profile = () => {
             <h1 className="font-semibold text-gray-900 dark:text-gray-100">
               Name:
               <span className="font-normal text-gray-700 dark:text-gray-300 ml-2">
-                Kumman Coder
+                {fullName}
               </span>
             </h1>
           </div>
@@ -44,7 +48,7 @@ const Profile = () => {
             <h1 className="font-semibold text-gray-900 dark:text-gray-100">
               Email:
               <span className="font-normal text-gray-700 dark:text-gray-300 ml-2">
-                kumman@gmail.com
+                {email}
               </span>
             </h1>
           </div>
@@ -52,7 +56,7 @@ const Profile = () => {
             <h1 className="font-semibold text-gray-900 dark:text-gray-100">
               Role:
               <span className="font-normal text-gray-700 dark:text-gray-300 ml-2">
-                Instructor
+                {role.toUpperCase()}
               </span>
             </h1>
           </div>
@@ -106,7 +110,9 @@ const Profile = () => {
           {enrolledCourses?.length === 0 ? (
             <h1>You have not enrolled in any course.</h1>
           ) : (
-            enrolledCourses.map((_, index) => <Course key={index} />)
+            enrolledCourses.map((course) => (
+              <Course key={index} course={course._id} />
+            ))
           )}
         </div>
       </div>

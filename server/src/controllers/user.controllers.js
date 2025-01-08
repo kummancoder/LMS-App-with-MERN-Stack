@@ -70,7 +70,7 @@ const login = asyncHandler(async (req, res) => {
   if (!password?.trim()) {
     return res.status(400).json(new ApiError(400, "password is required"));
   }
-  
+
   const user = await User.findOne({ email });
 
   if (!user) {
@@ -138,15 +138,10 @@ const logout = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "User logged Out"));
 });
 
-const getCurrentUser = asyncHandler(async(req, res) => {
+const getCurrentUser = asyncHandler(async (req, res) => {
   return res
-  .status(200)
-  .json(new ApiResponse(
-      200,
-      req.user,
-      "User fetched successfully"
-  ))
-})
+    .status(200)
+    .json(new ApiResponse(200, req.user, "User fetched successfully"));
+});
 
-
-export { register, login, logout,getCurrentUser };
+export { register, login, logout, getCurrentUser };
