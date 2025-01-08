@@ -1,8 +1,8 @@
 import React from "react";
 import LoginSignUp from "./pages/LoginSignUp";
-import Navbar from "./components/Navbar";
+import Cources from "./pages/student/Cources";
 import HeroSection from "./pages/student/HeroSection";
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import MainLayout from "./layout/MainLayout";
 
 const appRouter = createBrowserRouter([
@@ -15,7 +15,7 @@ const appRouter = createBrowserRouter([
         element: (
           <>
             <HeroSection />
-            {/* Courses */}
+            <Cources />
           </>
         ),
       },
@@ -29,7 +29,7 @@ const appRouter = createBrowserRouter([
 const App = () => {
   return (
     <main>
-      <RouterProvider router = {appRouter}/>
+      <RouterProvider router={appRouter} />
     </main>
   );
 };
