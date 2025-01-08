@@ -26,10 +26,10 @@ const userSchema = new Schema(
       enum: ["instructor", "student"],
       default: "student",
     },
-    enrolledCourses: {
+    enrolledCourses: [{
       type: Schema.Types.ObjectId,
       ref: "Course",
-    },
+    }],
     avatar: {
       type: String,
       default: "",
