@@ -27,8 +27,11 @@ import DarkMode from "../DarkMode";
 import { Link, useNavigate } from "react-router-dom";
 import { useLogoutUserMutation } from "@/features/api/authApi";
 import { toast } from "sonner";
+import { useSelector } from "react-redux";
 const Navbar = () => {
-  const user = true;
+  const { user } = useSelector((store) => store.auth);
+  console.log(user?.data?.avatar);
+
   const [logoutUser, { data, isSuccess }] = useLogoutUserMutation();
   useEffect(() => {
     if (isSuccess) {
@@ -36,7 +39,7 @@ const Navbar = () => {
     }
   }, [isSuccess]);
 
-   const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const logoutHandler = async () => {
     await logoutUser();
     navigate("/login");
@@ -58,7 +61,7 @@ const Navbar = () => {
               <DropdownMenuTrigger asChild>
                 <Avatar>
                   <AvatarImage
-                    src="https://github.com/shadcn.png"
+                    src={user?.data?.avatar || "https://github.com/shadcn.png"}
                     alt="@shadcn"
                   />
                   <AvatarFallback>CN</AvatarFallback>
