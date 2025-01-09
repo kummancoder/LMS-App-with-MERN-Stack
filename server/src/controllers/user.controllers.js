@@ -2,7 +2,10 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
-import { deleteMediaFromCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
+import {
+  deleteMediaFromCloudinary,
+  uploadOnCloudinary,
+} from "../utils/cloudinary.js";
 
 const generateAccessAndRefereshTokens = async (userId) => {
   try {
@@ -93,7 +96,7 @@ const login = asyncHandler(async (req, res) => {
   const isPasswordValid = await user.isPasswordCorrect(password);
 
   if (!isPasswordValid) {
-    return user.status(401).json(new ApiError(401, "Invalid user credentials"));
+    return res.status(401).json(new ApiError(401, "Invalid user credentials"));
   }
 
   const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(
@@ -190,8 +193,8 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user?._id);
     if (user?.avatar) {
       try {
-        const publicId = extractPublicIdFromUrl(user.avatar); 
-        await deleteMediaFromCloudinary(publicId); 
+        const publicId = extractPublicIdFromUrl(user.avatar);
+        await deleteMediaFromCloudinary(publicId);
       } catch (error) {
         console.error("Error deleting old avatar:", error);
         return res

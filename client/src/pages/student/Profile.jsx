@@ -107,7 +107,7 @@ const Profile = () => {
     return (
       <div className="max-w-4xl mx-auto my-24 px-4">
         <h1 className="font-bold text-2xl text-center md:text-left">
-          No User Data
+          No User Data Found
         </h1>
       </div>
     );

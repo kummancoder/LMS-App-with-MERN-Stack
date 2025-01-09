@@ -26,10 +26,10 @@ export const authApi = createApi({
       }),
       async onQueryStarted(_, { queryFulfilled, dispatch }) {
         try {
-          const { data } = await queryFulfilled;
-          console.log("Login API Response:", data);
-          if (data?.user) {
-            dispatch(userLoggedIn({ user: data.user }));
+          const result = await queryFulfilled;
+          console.log("Login API Response:", result.data.data);
+          if (result?.data) {
+            dispatch(userLoggedIn({ user: result.data }));
           }
         } catch (error) {
           console.error("Login API Error:", error);
@@ -41,19 +41,32 @@ export const authApi = createApi({
         url: "getCurrentUser",
         method: "GET",
       }),
+      async onQueryStarted(_, { queryFulfilled, dispatch }) {
+        try {
+          const result = await queryFulfilled;
+          console.log("Load API Response:", result.data.data);
+          if (result?.data) {
+            dispatch(userLoggedIn({ user: result.data }));
+          }
+        } catch (error) {
+          console.error("Load API Error:", error);
+        }
+      },
     }),
-    updateUserProfile : builder.mutation(
-      {
-        query: (inputData) => ({
-          url: "updateUserProfile",
-          method: "PUT",
-          body: inputData,
-          credentials:"include"
-      }
-    )
-        
-      
-    })
+    updateUserProfile: builder.mutation({
+      query: (inputData) => ({
+        url: "updateUserProfile",
+        method: "PUT",
+        body: inputData,
+        credentials: "include",
+      }),
+    }),
+    logoutUser: builder.mutation({
+      query: () => ({
+        url: "logout",
+        method: "POST",
+      }),
+    }),
   }),
 });
 
@@ -61,5 +74,6 @@ export const {
   useRegisterUserMutation,
   useLoginUserMutation,
   useLoadUserQuery,
-  useUpdateUserProfileMutation
+  useUpdateUserProfileMutation,
+  useLogoutUserMutation,
 } = authApi;
