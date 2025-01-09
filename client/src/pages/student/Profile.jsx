@@ -45,7 +45,7 @@ const Profile = () => {
 
   const updateUserHandler = async () => {
     const formData = new FormData();
-    formData.append("name", name);
+    formData.append("fullName", name);
     if (profilePhoto) {
       formData.append("profilePhoto", profilePhoto);
     }
@@ -121,7 +121,7 @@ const Profile = () => {
           <Avatar className="h-24 w-24 md:h-32 md:w-32 mb-4">
             <AvatarImage
               className="rounded-full"
-              src={user.photoUrl || "https://github.com/shadcn.png"}
+              src={user.avatar || "https://github.com/shadcn.png"}
               alt="@shadcn"
             />
             <AvatarFallback>CN</AvatarFallback>
@@ -132,7 +132,7 @@ const Profile = () => {
             <h1 className="font-semibold text-gray-900 dark:text-gray-100">
               Name:
               <span className="font-normal text-gray-700 dark:text-gray-300 ml-2">
-                {user.name}
+                {user.fullName}
               </span>
             </h1>
           </div>

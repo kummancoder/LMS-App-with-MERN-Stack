@@ -30,7 +30,7 @@ const appRouter = createBrowserRouter([
         element: <MyLearning />,
       },
       {
-        path: "profile",
+        path: "/profile",
         element: <Profile />,
       },
     ],
