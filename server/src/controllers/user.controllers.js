@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
+import { deleteMediaFromCloudinary } from "../utils/cloudinary.js";
 
 const generateAccessAndRefereshTokens = async (userId) => {
   try {
@@ -19,6 +20,18 @@ const generateAccessAndRefereshTokens = async (userId) => {
       "Something went wrong while generating referesh and access token"
     );
   }
+};
+
+const extractPublicIdFromUrl = (url) => {
+  if (!url) {
+    throw new Error("URL is missing");
+  }
+  const segments = url.split("/");
+  const fileName = segments.pop();
+  if (!fileName.includes(".")) {
+    throw new Error("Invalid URL structure");
+  }
+  return fileName.split(".")[0];
 };
 
 const register = asyncHandler(async (req, res) => {
@@ -118,7 +131,7 @@ const logout = asyncHandler(async (req, res) => {
     req.user._id,
     {
       $unset: {
-        refreshToken: 1, // this removes the field from document
+        refreshToken: 1, // this removes the fiel
       },
     },
     {
@@ -144,4 +157,68 @@ const getCurrentUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, req.user, "User fetched successfully"));
 });
 
-export { register, login, logout, getCurrentUser };
+const updateUserProfile = asyncHandler(async (req, res) => {
+  const { fullName } = req.body;
+  const avatarLocalPath = req.file?.path;
+
+  if (!fullName && !avatarLocalPath) {
+    return res
+      .status(400)
+      .json(
+        new ApiError(
+          400,
+          "At least one field (full name or avatar) is required for update"
+        )
+      );
+  }
+
+  let updateFields = {};
+
+  if (fullName) {
+    updateFields.fullName = fullName;
+  }
+
+  if (avatarLocalPath) {
+    const avatar = await uploadOnCloudinary(avatarLocalPath);
+
+    if (!avatar?.url) {
+      return res
+        .status(400)
+        .json(new ApiError(400, "Error while uploading avatar"));
+    }
+
+    const user = await User.findById(req.user?._id);
+    if (user?.avatar) {
+      try {
+        const publicId = extractPublicIdFromUrl(user.avatar); 
+        await deleteMediaFromCloudinary(publicId); 
+      } catch (error) {
+        console.error("Error deleting old avatar:", error);
+        return res
+          .status(500)
+          .json(new ApiError(500, "Error deleting old avatar"));
+      }
+    }
+    updateFields.avatar = avatar.url;
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set: updateFields,
+    },
+    { new: true }
+  ).select("-password");
+
+  if (!updatedUser) {
+    return res
+      .status(500)
+      .json(new ApiError(500, "Something went wrong while updating user"));
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, updatedUser, "Profile updated successfully"));
+});
+
+export { register, login, logout, getCurrentUser, updateUserProfile };
