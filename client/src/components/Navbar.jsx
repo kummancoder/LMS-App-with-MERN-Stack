@@ -30,7 +30,7 @@ import { toast } from "sonner";
 import { useSelector } from "react-redux";
 const Navbar = () => {
   const { user } = useSelector((store) => store.auth);
-  console.log(user?.data?.avatar);
+  // console.log("Avatar",user?.data?.user?.avatar,user,"user data");
 
   const [logoutUser, { data, isSuccess }] = useLogoutUserMutation();
   useEffect(() => {
@@ -61,7 +61,11 @@ const Navbar = () => {
               <DropdownMenuTrigger asChild>
                 <Avatar>
                   <AvatarImage
-                    src={user?.data?.avatar || "https://github.com/shadcn.png"}
+                    src={
+                      user?.data?.avatar ||
+                      user?.data?.user?.avatar ||
+                      "https://github.com/shadcn.png"
+                    }
                     alt="@shadcn"
                   />
                   <AvatarFallback>CN</AvatarFallback>
@@ -81,14 +85,25 @@ const Navbar = () => {
                     Log out
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Dashboard</DropdownMenuItem>
+                {(user?.data?.role || user?.data?.user?.role) ===
+                  "instructor" && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>Dashboard</DropdownMenuItem>
+                  </>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
             <div className="flex items-center gap-2">
-              <Button variant="outline">Login</Button>
-              <Button>Signup</Button>
+              <Link to={"/login"}>
+                {" "}
+                <Button variant="outline">Login</Button>
+              </Link>
+              <Link to={"/login"}>
+                {" "}
+                <Button>Signup</Button>
+              </Link>
             </div>
           )}
           <DarkMode />

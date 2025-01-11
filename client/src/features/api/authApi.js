@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { userLoggedIn } from "../authSlice";
+import { userLoggedIn, userLoggedOut } from "../authSlice";
 
 const USER_API = "http://localhost:8000/api/v1/user/";
 
@@ -27,7 +27,7 @@ export const authApi = createApi({
       async onQueryStarted(_, { queryFulfilled, dispatch }) {
         try {
           const result = await queryFulfilled;
-          console.log("Login API Response:", result.data.data);
+          // console.log("Login API Response:", result.data.data);
           if (result?.data) {
             dispatch(userLoggedIn({ user: result.data }));
           }
@@ -44,7 +44,7 @@ export const authApi = createApi({
       async onQueryStarted(_, { queryFulfilled, dispatch }) {
         try {
           const result = await queryFulfilled;
-          console.log("Load API Response:", result.data.data);
+          // console.log("Load API Response:", result.data.data);
           if (result?.data) {
             dispatch(userLoggedIn({ user: result.data }));
           }
@@ -66,6 +66,13 @@ export const authApi = createApi({
         url: "logout",
         method: "POST",
       }),
+      async onQueryStarted(_, { queryFulfilled, dispatch }) {
+        try {
+          dispatch(userLoggedOut());
+        } catch (error) {
+          console.error("Load API Error:", error);
+        }
+      },
     }),
   }),
 });
