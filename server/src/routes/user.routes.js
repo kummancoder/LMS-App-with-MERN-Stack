@@ -3,8 +3,8 @@ import {
   login,
   logout,
   register,
-  getCurrentUser,
-  updateUserProfile,
+  getUserProfile,
+  updateProfile,
 } from "../controllers/user.controllers.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
@@ -13,10 +13,10 @@ const router = Router();
 
 router.route("/register").post(register);
 router.route("/login").post(login);
-router.route("/logout").post(verifyJWT, logout);
-router.route("/getCurrentUser").get(verifyJWT, getCurrentUser);
+router.route("/logout").post(logout);
+router.route("/profile").get(verifyJWT, getUserProfile);
 router
-  .route("/updateUserProfile")
-  .put(verifyJWT, upload.single("profilePhoto"), updateUserProfile);
+  .route("/profile/update")
+  .put(verifyJWT, upload.single("profilePhoto"),updateProfile );
 
 export default router;
