@@ -1,46 +1,36 @@
 import { v2 as cloudinary } from "cloudinary";
-import fs from "fs";
+import dotenv from "dotenv";
+dotenv.config({});
 
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
+  cloud_name: process.env.CLOUD_NAME,
   api_secret: process.env.CLOUDINARY_API_SECRET,
+  api_key: process.env.CLOUDINARY_API_KEY,
 });
 
-const uploadOnCloudinary = async (localFilePath) => {
+export const uploadMedia = async (file) => {
   try {
-    if (!localFilePath) return null;
-    //upload the file on cloudinary
-    const response = await cloudinary.uploader.upload(localFilePath, {
+    const uploadResponse = await cloudinary.uploader.upload(file, {
       resource_type: "auto",
     });
-    // file has been uploaded successfull
-    //console.log("file is uploaded on cloudinary ", response.url);
-    fs.unlinkSync(localFilePath);
-    return response;
+    return uploadResponse;
   } catch (error) {
-    fs.unlinkSync(localFilePath); // remove the locally saved temporary file as the upload operation got failed
-    return null;
+    console.log(error);
   }
 };
 
-const deleteMediaFromCloudinary = async (publicId) => {
+export const deleteMediafromCloudinary = async (publicId) => {
   try {
     await cloudinary.uploader.destroy(publicId);
   } catch (error) {
-    console.log("error in deleting media from cloudinary", error);
+    console.log(error);
   }
 };
 
-const deleteVideoFromCloudinary = async (publicId) => {
+export const deleteVideofromCloudinary = async (publicId) => {
   try {
     await cloudinary.uploader.destroy(publicId, { resource_type: "video" });
   } catch (error) {
-    console.log("error in deleting video from cloudinary", error);
+    console.log(error);
   }
-};
-export {
-  uploadOnCloudinary,
-  deleteMediaFromCloudinary,
-  deleteVideoFromCloudinary,
 };

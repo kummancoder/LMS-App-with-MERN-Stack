@@ -6,8 +6,8 @@ export const generateToken = (res, user, message) => {
     try {
         const token = jwt.sign(
             { userId: user._id },
-            process.env.SECRET_KEY,
-            { expiresIn: process.env.TOKEN_EXPIRY }
+            process.env.ACCESS_TOKEN_SECRET,
+            { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
         );
 
         const options = {
