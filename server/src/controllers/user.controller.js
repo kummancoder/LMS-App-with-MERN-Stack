@@ -1,4 +1,4 @@
-import { User } from '../model/user.model.js';
+import { User } from '../models/user.model.js';
 import bcrypt from 'bcryptjs';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiResponse } from '../utils/ApiResponse.js';

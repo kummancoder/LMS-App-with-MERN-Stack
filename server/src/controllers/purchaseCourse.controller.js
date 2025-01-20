@@ -1,7 +1,7 @@
-import { PurchaseCourse } from "../model/purchaseCourse.model.js";
-import { Course } from '../model/course.model.js';
-import { Lecture } from "../model/lecture.model.js";
-import { User } from "../model/user.model.js";
+import { PurchaseCourse } from "../models/purchaseCourse.model.js";
+import { Course } from '../models/course.model.js';
+import { Lecture } from "../models/lecture.model.js";
+import { User } from "../models/user.model.js";
 import Stripe from 'stripe';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiResponse } from '../utils/ApiResponse.js';;

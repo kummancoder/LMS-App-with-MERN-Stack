@@ -5,7 +5,7 @@ import {
   register,
   getUserProfile,
   updateProfile,
-} from "../controllers/user.controllers.js";
+} from "../controllers/user.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
 

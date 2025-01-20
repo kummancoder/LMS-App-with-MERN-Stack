@@ -1,5 +1,5 @@
 import express from "express";
-import isAuthenticated from "../middlewares/isAuthenticated.js";
+import { verifyJWT } from "../middlewares/auth.middleware.js";
 import {
   createCheckoutSession,
   getAllPurchasedCourse,
@@ -13,7 +13,7 @@ router
   .route("/webhook")
   .post(express.raw({ type: "application/json" }), stripeWebhook);
 
-router.use(isAuthenticated);
+router.use(verifyJWT);
 
 router.route("/checkout/create-checkout-session").post(createCheckoutSession);
 router

@@ -1,6 +1,6 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { Course } from "../model/course.model.js";
-import { Lecture } from "../model/lecture.model.js";
+import { Course } from "../models/course.model.js";
+import { Lecture } from "../models/lecture.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { deleteMediafromCloudinary, deleteVideofromCloudinary, uploadMedia } from '../utils/Cloudinary.js';

@@ -1,9 +1,9 @@
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { ApiError } from '../utils/ApiError.js';
-import { CoursreProgress } from '../model/courseProgress.model.js';
+import { CoursreProgress } from '../models/courseProgress.model.js';
 import { isValidObjectId } from 'mongoose';
-import { Course } from '../model/course.model.js'
+import { Course } from '../models/course.model.js'
 
 export const getCourseProgress = asyncHandler(async(req,res)=>{
     const {courseId} = req.params;
