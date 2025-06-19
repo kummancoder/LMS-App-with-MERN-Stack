@@ -1,38 +1,33 @@
-import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
+import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true
+    name:{
+        type:String,
+        required:true
     },
-    email: {
-        type: String,
-        required: true
+    email:{
+        type:String,
+        required:true
     },
-    password: {
-        type: String,
-        required: true
+    password:{
+        type:String,
+        required:true
     },
-    role: {
-        type: String,
-        enum:['student','instructor'],
-        default: 'student'
+    role:{
+        type:String,
+        enum:["instructor", "student"],
+        default:'student'
     },
-    enrolledCourses: [
+    enrolledCourses:[
         {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Course'
+            type:mongoose.Schema.Types.ObjectId,
+            ref:'Course'
         }
     ],
-    photoUrl: {
-        type: String,
-        default: ""
+    photoUrl:{
+        type:String,
+        default:""
     }
-},{timestamps: true})
-
-userSchema.methods.isPasswordCorrect = async function (password) {
-    return await bcrypt.compare(password, this.password);  
-}
+},{timestamps:true});
 
 export const User = mongoose.model("User", userSchema);

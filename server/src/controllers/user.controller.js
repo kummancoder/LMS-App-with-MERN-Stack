@@ -1,127 +1,152 @@
-import { User } from '../models/user.model.js';
-import bcrypt from 'bcryptjs';
-import { asyncHandler } from '../utils/asyncHandler.js';
-import { ApiResponse } from '../utils/ApiResponse.js';
-import { ApiError } from '../utils/ApiError.js'
-import { generateToken } from '../utils/generateToken.js';
-import { deleteMediafromCloudinary, uploadMedia } from '../utils/Cloudinary.js';
+import {User} from "../models/user.model.js";
+import bcrypt from "bcryptjs";
+import { generateToken } from "../utils/generateToken.js";
+import { deleteMediaFromCloudinary, uploadMedia } from "../utils/cloudinary.js";
 
-export const register = asyncHandler(async (req, res) => {
-    const { name, email, password } = req.body;
-
-    if (!name || !email || !password || [name, email, password].some((field) => field.trim() === "")) {
-        throw new ApiError(400, "All fields are required");
+export const register = async (req,res) => {
+    try {
+       
+        console.log(req.body);
+        const {name, email, password} = req.body; // patel214
+        console.log(name, email, password);
+        if(!name || !email || !password){
+            return res.status(400).json({
+                success:false,
+                message:"All fields are required."
+            })
+        }
+        const user = await User.findOne({email});
+        if(user){
+            return res.status(400).json({
+                success:false,
+                message:"User already exist with this email."
+            })
+        }
+        const hashedPassword = await bcrypt.hash(password, 10);
+        await User.create({
+            name,
+            email,
+            password:hashedPassword
+        });
+        return res.status(201).json({
+            success:true,
+            message:"Account created successfully."
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success:false,
+            message:"Failed to register"
+        })
     }
+}
+export const login = async (req,res) => {
+    try {
+        const {email, password} = req.body;
+        if(!email || !password){
+            return res.status(400).json({
+                success:false,
+                message:"All fields are required."
+            })
+        }
+        const user = await User.findOne({email});
+        if(!user){
+            return res.status(400).json({
+                success:false,
+                message:"Incorrect email or password"
+            })
+        }
+        const isPasswordMatch = await bcrypt.compare(password, user.password);
+        if(!isPasswordMatch){
+            return res.status(400).json({
+                success:false,
+                message:"Incorrect email or password"
+            });
+        }
+        generateToken(res, user, `Welcome back ${user.name}`);
 
-    const user = await User.findOne({ email });
-
-    if (user) {
-        throw new ApiError(400, "User already exists")
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success:false,
+            message:"Failed to login"
+        })
     }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const createdUser = await User.create({
-        name,
-        email,
-        password: hashedPassword
-    })
-
-    if (!createdUser) {
-        throw new ApiError(500, "Something went wrong while registering the user")
+}
+export const logout = async (_,res) => {
+    try {
+        return res.status(200).cookie("token", "", {maxAge:0}).json({
+            message:"Logged out successfully.",
+            success:true
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success:false,
+            message:"Failed to logout"
+        }) 
     }
-
-    return res.status(201).json(
-        new ApiResponse(201, createdUser, "User registered successfully")
-    )
-})
-
-export const login = asyncHandler(async (req, res) => {
-    const { email, password } = req.body;
-
-    if (!password || !email || [email, password].some((field) =>
-        field?.trim() === "")
-    ) {
-        throw new ApiError(400, "All fields are required")
+}
+export const getUserProfile = async (req,res) => {
+    try {
+        const userId = req.id;
+        const user = await User.findById(userId).select("-password").populate("enrolledCourses");
+        if(!user){
+            return res.status(404).json({
+                message:"Profile not found",
+                success:false
+            })
+        }
+        return res.status(200).json({
+            success:true,
+            user
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success:false,
+            message:"Failed to load user"
+        })
     }
+}
+export const updateProfile = async (req,res) => {
+    try {
+        const userId = req.id;
+        const {name} = req.body;
+        const profilePhoto = req?.file;
 
-    const user = await User.findOne({ email });
+        const user = await User.findById(userId);
+        if(!user){
+            return res.status(404).json({
+                message:"User not found",
+                success:false
+            }) 
+        }
+        console.log(user);
+        // extract public id of the old image from the url is it exists;
+        if(user.photoUrl){
+            const publicId = user.photoUrl.split("/").pop().split(".")[0]; // extract public id
+            deleteMediaFromCloudinary(publicId);
+        }
 
-    if (!user) {
-        throw new ApiError(400, "Email or password is incorrect")
+        // upload new photo
+        const cloudResponse = await uploadMedia(profilePhoto?.path);
+        const photoUrl = cloudResponse?.secure_url;
+
+        const updatedData = {name, photoUrl};
+        const updatedUser = await User.findByIdAndUpdate(userId, updatedData, {new:true}).select("-password");
+
+        return res.status(200).json({
+            success:true,
+            user:updatedUser,
+            message:"Profile updated successfully."
+        })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success:false,
+            message:"Failed to update profile"
+        })
     }
-
-    const isPasswordValid = await user.isPasswordCorrect(password);
-
-    if (!isPasswordValid) {
-        throw new ApiError(400, "Email or password is incorrect")
-    }
-
-    generateToken(res, user, `Welcome back ${user.name}`);
-
-})
-
-export const logout = asyncHandler(async (_, res) => {
-    const options = {
-        httpOnly: true,
-        secure: true,
-        maxAge: 0
-    }
-    return res.status(200).clearCookie("token", options,).json(
-        new ApiResponse(200, "User Logged out Successfully")
-    )
-})
-
-export const getUserProfile = asyncHandler(async (req, res) => {
-
-    const userId = req.user?._id;
-
-    if (!userId) {
-        throw new ApiError(404, "User profile not found");
-    }
-
-    const user = await User.findById(userId).select('-password').populate('enrolledCourses')
-
-    if(!user){
-        throw new ApiError(404, "User not found");
-    }
-
-    return res
-        .status(200)
-        .json(
-            new ApiResponse(200, user, "Profile fetched successfully")
-        )
-})
-
-export const updateProfile = asyncHandler(async (req, res) => {
-    const { name } = req.body;
-    const profilePhotoPath = req.file?.path;
-
-    if (!profilePhotoPath || !req.file.mimetype.startsWith('image/')) {
-        throw new ApiError(400, "Invalid file or file is missing")
-    }
-
-    if (req.user.photoUrl) {
-        const publicId = req.user.photoUrl.split('/').pop().split('.')[0];
-        deleteMediafromCloudinary(publicId);
-    }
-
-    const cloudResponse = await uploadMedia(profilePhotoPath);
-    const photoUrl = cloudResponse.secure_url;
-
-    const user = await User.findByIdAndUpdate(
-        req.user?._id,
-        {
-            $set : {
-                name,
-                photoUrl
-            }
-        },{new: true}
-    ).select('-password')
-
-    return res
-        .status(200)
-        .json(
-            new ApiResponse(200, user, "Profile updated successfully")
-        )
-})
+}

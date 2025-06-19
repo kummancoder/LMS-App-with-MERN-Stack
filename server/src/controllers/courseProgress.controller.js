@@ -1,127 +1,139 @@
-import { asyncHandler } from '../utils/asyncHandler.js';
-import { ApiResponse } from '../utils/ApiResponse.js';
-import { ApiError } from '../utils/ApiError.js';
-import { CoursreProgress } from '../models/courseProgress.model.js';
-import { isValidObjectId } from 'mongoose';
-import { Course } from '../models/course.model.js'
+import { CourseProgress } from "../models/courseProgress.model.js";
+import { Course } from "../models/course.model.js";
 
-export const getCourseProgress = asyncHandler(async(req,res)=>{
-    const {courseId} = req.params;
-    const userId = req.user._id;
+export const getCourseProgress = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const userId = req.id;
 
-    if(!isValidObjectId(courseId) || !isValidObjectId(userId)){
-        throw new ApiError(404,"courseId and userId are not valid")
+    // step-1 fetch the user course progress
+    let courseProgress = await CourseProgress.findOne({
+      courseId,
+      userId,
+    }).populate("courseId");
+
+    const courseDetails = await Course.findById(courseId).populate("lectures");
+
+    if (!courseDetails) {
+      return res.status(404).json({
+        message: "Course not found",
+      });
     }
 
-    let courseProgress = await CoursreProgress.findOne({courseId,userId}).populate('courseId');
-
-    const courseDetails = await Course.findById(courseId).populate('lectures');
-
-    if(!courseDetails){
-        throw new ApiError(404,"Course not found")
+    // Step-2 If no progress found, return course details with an empty progress
+    if (!courseProgress) {
+      return res.status(200).json({
+        data: {
+          courseDetails,
+          progress: [],
+          completed: false,
+        },
+      });
     }
 
-    if(!courseProgress){
-        return res.status(200).json(
-            new ApiResponse(200,{courseDetails,progress:[],completed: false})
-        )
+    // Step-3 Return the user's course progress alog with course details
+    return res.status(200).json({
+      data: {
+        courseDetails,
+        progress: courseProgress.lectureProgress,
+        completed: courseProgress.completed,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const updateLectureProgress = async (req, res) => {
+  try {
+    const { courseId, lectureId } = req.params;
+    const userId = req.id;
+
+    // fetch or create course progress
+    let courseProgress = await CourseProgress.findOne({ courseId, userId });
+
+    if (!courseProgress) {
+      // If no progress exist, create a new record
+      courseProgress = new CourseProgress({
+        userId,
+        courseId,
+        completed: false,
+        lectureProgress: [],
+      });
     }
 
-    return res.status(200).json(
-        new ApiResponse(200,{courseDetails,progress: courseProgress.lectureProgress,completed: courseProgress.completed})
-    )
-})
+    // find the lecture progress in the course progress
+    const lectureIndex = courseProgress.lectureProgress.findIndex(
+      (lecture) => lecture.lectureId === lectureId
+    );
 
-export const updateLectureProgress = asyncHandler(async(req,res)=>{
-    const {courseId,lectureId} = req.params;
-    const userId = req.user._id;
-
-    if(!isValidObjectId(courseId) || !isValidObjectId(userId) || !isValidObjectId(lectureId)){
-        throw new ApiError(404,"courseId or userId or lectureId are not valid")
-    }
-
-    let courseProgress = await CoursreProgress.findOne({courseId,userId});
-
-    if(!courseProgress){
-        courseProgress = new CoursreProgress({
-            userId,
-            courseId,
-            completed: false,
-            lectureProgress: []
-        })
-    }
-
-    const lectureIndex = courseProgress.lectureProgress.findIndex((lecture) => lecture.lectureId === lectureId);
-
-    if(lectureIndex !== -1){
-        courseProgress.lectureProgress[lectureIndex].viewed = true;
+    if (lectureIndex !== -1) {
+      // if lecture already exist, update its status
+      courseProgress.lectureProgress[lectureIndex].viewed = true;
     } else {
-        courseProgress.lectureProgress.push({
-            lectureId,viewed: true
-        })
+      // Add new lecture progress
+      courseProgress.lectureProgress.push({
+        lectureId,
+        viewed: true,
+      });
     }
 
-    const lectureprogressLength = courseProgress.lectureProgress.filter((lectureprog)=>lectureprog.viewed).length;
+    // if all lecture is complete
+    const lectureProgressLength = courseProgress.lectureProgress.filter(
+      (lectureProg) => lectureProg.viewed
+    ).length;
 
     const course = await Course.findById(courseId);
 
-    if(course.lectures.length === lectureprogressLength){
-        courseProgress.completed = true;
-    }
+    if (course.lectures.length === lectureProgressLength)
+      courseProgress.completed = true;
 
     await courseProgress.save();
 
-    return res.status(200).json(
-        new ApiResponse(200,"Lecture Progress updated successfully")
-    )
-})
+    return res.status(200).json({
+      message: "Lecture progress updated successfully.",
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
 
-export const markAsCompleted = asyncHandler(async(req,res)=>{
-    const {courseId} = req.params;
-    const userId = req.user._id;
+export const markAsCompleted = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const userId = req.id;
 
-    if(!isValidObjectId(courseId) || !isValidObjectId(userId)){
-        throw new ApiError(404,"courseId and userId are not valid")
-    }
+    const courseProgress = await CourseProgress.findOne({ courseId, userId });
+    if (!courseProgress)
+      return res.status(404).json({ message: "Course progress not found" });
 
-    const courseProgress = await CoursreProgress.findOne({courseId,userId});
-
-    if(!courseProgress){
-        throw new ApiError(404,"course progress not found")
-    }
-
-    courseProgress.lectureProgress.map((lecturepro)=> lecturepro.viewed = true);
-
+    courseProgress.lectureProgress.map(
+      (lectureProgress) => (lectureProgress.viewed = true)
+    );
     courseProgress.completed = true;
-
     await courseProgress.save();
+    return res.status(200).json({ message: "Course marked as completed." });
+  } catch (error) {
+    console.log(error);
+  }
+};
 
-    return res.status(200).json(
-        new ApiResponse(200,"course marked as completed")
-    )
-})
-
-export const markAsIncompleted = asyncHandler(async(req,res)=>{
-    const {courseId} = req.params;
-    const userId = req.user._id;
-
-    if(!isValidObjectId(courseId) || !isValidObjectId(userId)){
-        throw new ApiError(404,"courseId and userId are not valid")
+export const markAsInCompleted = async (req, res) => {
+    try {
+      const { courseId } = req.params;
+      const userId = req.id;
+  
+      const courseProgress = await CourseProgress.findOne({ courseId, userId });
+      if (!courseProgress)
+        return res.status(404).json({ message: "Course progress not found" });
+  
+      courseProgress.lectureProgress.map(
+        (lectureProgress) => (lectureProgress.viewed = false)
+      );
+      courseProgress.completed = false;
+      await courseProgress.save();
+      return res.status(200).json({ message: "Course marked as incompleted." });
+    } catch (error) {
+      console.log(error);
     }
-
-    const courseProgress = await CoursreProgress.findOne({courseId,userId});
-
-    if(!courseProgress){
-        throw new ApiError(404,"course progress not found")
-    }
-
-    courseProgress.lectureProgress.map((lecturepro)=> lecturepro.viewed = false);
-
-    courseProgress.completed = false;
-
-    await courseProgress.save();
-
-    return res.status(200).json(
-        new ApiResponse(200,"course marked as Incompleted")
-    )
-})
+  };
