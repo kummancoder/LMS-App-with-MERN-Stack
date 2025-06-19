@@ -6,9 +6,8 @@ import { deleteMediaFromCloudinary, uploadMedia } from "../utils/cloudinary.js";
 export const register = async (req,res) => {
     try {
        
-        console.log(req.body);
         const {name, email, password} = req.body; // patel214
-        console.log(name, email, password);
+        // console.log(name, email, password);
         if(!name || !email || !password){
             return res.status(400).json({
                 success:false,
@@ -122,7 +121,7 @@ export const updateProfile = async (req,res) => {
                 success:false
             }) 
         }
-        console.log(user);
+        // console.log(user);
         // extract public id of the old image from the url is it exists;
         if(user.photoUrl){
             const publicId = user.photoUrl.split("/").pop().split(".")[0]; // extract public id
