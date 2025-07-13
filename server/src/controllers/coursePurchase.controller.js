@@ -87,12 +87,14 @@ export const stripeWebhook = async (req, res) => {
     return res.status(400).send(`Webhook error: ${error.message}`);
   }
 
-  // Handle the checkout session completed event
   if (event.type === "checkout.session.completed") {
     console.log("check session complete is called");
 
     try {
       const session = event.data.object;
+
+      const userId = session.metadata?.userId;
+      const courseId = session.metadata?.courseId;
 
       const purchase = await CoursePurchase.findOne({
         paymentId: session.id,
@@ -107,7 +109,6 @@ export const stripeWebhook = async (req, res) => {
       }
       purchase.status = "completed";
 
-      // Make all lectures visible by setting `isPreviewFree` to true
       if (purchase.courseId && purchase.courseId.lectures.length > 0) {
         await Lecture.updateMany(
           { _id: { $in: purchase.courseId.lectures } },
@@ -117,17 +118,16 @@ export const stripeWebhook = async (req, res) => {
 
       await purchase.save();
 
-      // Update user's enrolledCourses
       await User.findByIdAndUpdate(
-        purchase.userId,
-        { $addToSet: { enrolledCourses: purchase.courseId._id } }, // Add course ID to enrolledCourses
+        userId,
+        { $addToSet: { enrolledCourses: courseId } }, // Add course ID to enrolledCourses
         { new: true }
       );
 
-      // Update course to add user ID to enrolledStudents
+      console.log("updating course with userId : ", purchase);
       await Course.findByIdAndUpdate(
-        purchase.courseId._id,
-        { $addToSet: { enrolledStudents: purchase.userId } }, // Add user ID to enrolledStudents
+        courseId,
+        { $addToSet: { enrolledStudents: userId } },
         { new: true }
       );
     } catch (error) {
@@ -137,6 +137,7 @@ export const stripeWebhook = async (req, res) => {
   }
   res.status(200).send();
 };
+
 export const getCourseDetailWithPurchaseStatus = async (req, res) => {
   try {
     const { courseId } = req.params;
@@ -155,7 +156,7 @@ export const getCourseDetailWithPurchaseStatus = async (req, res) => {
 
     return res.status(200).json({
       course,
-      purchased: !!purchased, // true if purchased, false otherwise
+      purchased: !!purchased,
     });
   } catch (error) {
     console.log(error);
