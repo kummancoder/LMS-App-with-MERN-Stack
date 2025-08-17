@@ -2,7 +2,7 @@
 ---
 
 
-A full-stack *Learning Management System (LMS)* built with the *MERN stack*.  
+A full-stack **Learning Management System (LMS)** built with the **MERN stack**.  
 This platform allows students to purchase courses, track their progress, and interact with learning content, while instructors can manage courses and monitor learners.
 
 
@@ -14,11 +14,11 @@ This platform allows students to purchase courses, track their progress, and int
 
 ## 🚀 Tech Stack
 
-*Frontend:* React.js (Vite), TailwindCSS, Redux, Shadcn UI, Vercel deployment  
-*Backend:* Node.js, Express.js, MongoDB Atlas, Render deployment  
-*Authentication:* JWT-based auth  
-*File Storage (if used):* Cloudinary
-*Database:* MongoDB Atlas
+**Frontend:** React.js (Vite), TailwindCSS, Redux, Shadcn UI, Vercel deployment  
+**Backend:** Node.js, Express.js, MongoDB Atlas, Render deployment  
+**Authentication:** JWT-based auth  
+**File Storage (if used):** Cloudinary
+**Database:** MongoDB Atlas
 
 ---
 
@@ -37,7 +37,7 @@ This platform allows students to purchase courses, track their progress, and int
 ---
 ## ✨ Features
 
-- 👨‍🎓 *Student Module*
+- 👨‍🎓 **Student Module**
     
     - Browse and purchase courses
         
@@ -45,20 +45,20 @@ This platform allows students to purchase courses, track their progress, and int
         
     - Resume learning anytime
         
-- 👩‍🏫 *Instructor Module*
+- 👩‍🏫 **Instructor Module**
     
     - Create, update, and delete courses
         
     - Upload video lectures and track payments
     - Admin Dashboard
         
-- 🔐 *Authentication & Authorization*
+- 🔐 **Authentication & Authorization**
     
     - JWT-based secure login/signup
         
     - Role-based access control (Student/Instructor)
         
-- ⚡ *Other Features*
+- ⚡ **Other Features**
     
     - Payment Integration
         
@@ -71,7 +71,7 @@ This platform allows students to purchase courses, track their progress, and int
 
 ## 📂 Project Structure
 
-bash
+```bash
 lms-project/
 │
 ├── client/             # React frontend (Vite)
@@ -85,14 +85,14 @@ lms-project/
 │   └── package.json
 │
 └── README.md           # Documentation
-
+```
 ---
 
-## ⚙ Environment Variables
+## ⚙️ Environment Variables
 
-### Backend (server/.env)
+### Backend (`server/.env`)
 
-js
+```js
 PORT=8080 
 MONGO_URI=your_mongodb_connection 
 JWT_SECRET=your_jwt_secret 
@@ -100,39 +100,39 @@ CLOUDINARY_CLOUD_NAME=xxxx
 CLOUDINARY_API_KEY=xxxx 
 CLOUDINARY_API_SECRET=xxxx 
 FRONTEND_URL=http://localhost:5173  
+```
 
+### Frontend (`client/.env`)
 
-### Frontend (client/.env)
-
-VITE_API_BASE_URL=http://localhost:8080/api/v1
+`VITE_API_BASE_URL=http://localhost:8080/api/v1`
 
 In production (Vercel settings → Environment Variables):
 
-VITE_API_BASE_URL=https://your-backend.onrender.com/api/v1
+`VITE_API_BASE_URL=https://your-backend.onrender.com/api/v1`
 
 ---
 
-## 🛠 Installation & Setup
+## 🛠️ Installation & Setup
 
 ### Clone the repository
 
-git clone https://github.com/yourusername/lms-project.git cd lms-project
+`git clone https://github.com/yourusername/lms-project.git cd lms-project`
 
 ### Backend Setup
 
-cd server npm install npm run dev
+`cd server npm install npm run dev`
 
 ### Frontend Setup
 
-cd client npm install npm run dev
+`cd client npm install npm run dev`
 
 ---
 
 ## 🚀 Deployment
 
-- *Backend:* Deployed on Render
+- **Backend:** Deployed on Render
     
-- *Frontend:* Deployed on Vercel
+- **Frontend:** Deployed on Vercel
     
 
 ---
@@ -141,19 +141,19 @@ cd client npm install npm run dev
 
 Base URL:
 
-/api/v1
+`/api/v1`
 
 Example routes:
 
-- POST /auth/signup → Register user
+- `POST /auth/signup` → Register user
     
-- POST /auth/login → Login user
+- `POST /auth/login` → Login user
     
-- GET /courses → Get all courses
+- `GET /courses` → Get all courses
     
-- POST /purchase → Purchase a course
+- `POST /purchase` → Purchase a course
     
-- GET /progress/:courseId → Track progress
+- `GET /progress/:courseId` → Track progress
     
 
 ---
@@ -164,11 +164,11 @@ Contributions are welcome!
 
 1. Fork the repo
     
-2. Create a new branch: git checkout -b feature/YourFeature
+2. Create a new branch: `git checkout -b feature/YourFeature`
     
-3. Commit your changes: git commit -m 'Add feature'
+3. Commit your changes: `git commit -m 'Add feature'`
     
-4. Push to branch: git push origin feature/YourFeature
+4. Push to branch: `git push origin feature/YourFeature`
     
 5. Open a Pull Request
     
